@@ -1,14 +1,18 @@
-import { createDir, exists, readDir, writeTextFile } from "@tauri-apps/api/fs";
+import { BaseDirectory, createDir, exists, readDir, writeTextFile } from "@tauri-apps/api/fs";
 import { appDataDir } from "@tauri-apps/api/path";
+import { getProjectsData } from "./data";
+import { setAllProjects } from "./state";
 
 export async function initialStart() {
-    const appdata = await appDataDir();
-    const hasDir = await exists(`${appdata}/scriptshooter`);
-    const hasScriptSave = await exists(`${appdata}/scriptshooter/scripts.json`);
-    if(!hasDir) {
-        await createDir(`${appdata}/scriptshooter`);
+    const dataDir = await appDataDir();
+    const hasAppDir = await exists(dataDir);
+    if(!hasAppDir) {
+        await createDir(dataDir);
     }
+    const hasScriptSave = await exists(`projects.json`, { dir: BaseDirectory.AppData });
     if(!hasScriptSave) {
-        await writeTextFile(`${appdata}/scriptshooter/scripts.json`, JSON.stringify([]));
+        await writeTextFile(`projects.json`, JSON.stringify([]), {dir: BaseDirectory.AppData});
     }
+    const projects = await getProjectsData();
+    setAllProjects(projects);
 }
