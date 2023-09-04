@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::os::windows::process::CommandExt;
-use std::process::{Command, Stdio};
+use std::process::Command;
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -14,6 +14,7 @@ fn greet(name: &str) -> String {
 fn open_nvim(path: &str) {
     Command::new("D:\\IDE_STUFF\\NeoVim\\bin\\nvim.exe")
         .raw_arg(path)
+        .current_dir(path)
         .creation_flags(0x00000010)
         .spawn()
         .expect("failed to open nvim");
@@ -21,10 +22,12 @@ fn open_nvim(path: &str) {
 
 #[tauri::command]
 fn open_vs(path: &str) {
-    std::process::Command::new("cmd")
-        .args([path, "code ."])
+    Command::new("C:\\Microsoft VS Code\\Code.exe")
+        .raw_arg(path)
+        .current_dir(path)
+        .creation_flags(0x00000010)
         .spawn()
-        .expect("failed to open nvim");
+        .expect("failed to open vscode");
 }
 
 fn main() {

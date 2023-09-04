@@ -3,16 +3,13 @@ import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 import { initialStart } from "./startup";
 import InputModal from "./components/InputModal";
-import { allProjects } from "./state";
-import { Command, open } from "@tauri-apps/api/shell";
+import { allProjects, setAllProjects } from "./state";
+import { Project } from "./data";
 
 export const [showInputModal, setShowInputModal] = createSignal(false);
 export const [inputModalType, setInputModalType] = createSignal("");
 
 function App() {
-  const [greetMsg, setGreetMsg] = createSignal("");
-  const [savedProjects, setSavedProjects] = createSignal([]);
-  const [name, setName] = createSignal("");
   const [initializationRan, setInitializationRan] = createSignal(false);
 
   onMount(async () => {
@@ -25,11 +22,33 @@ function App() {
     setInputModalType("new project");
   }
 
+  function addFolderHandler() {
+    setShowInputModal(true);
+    setInputModalType("new folder");
+  }
+
+  function openMostRecent() {
+    openProjectHandler("nvim", allProjects()[0]);
+  }
+
+  function openProjectHandler(ide: "vs" | "nvim", proj: Project) {
+    switch(ide) {
+      case "vs":
+        openVSHandler(proj.path);
+        break;
+      case "nvim":
+        openNvimHandler(proj.path);
+        break;
+    }
+    proj.lastOpened = Date.now();
+    setAllProjects((prev) => [proj, ...prev.filter((p) => p.path !== proj.path)])
+  }
+
   async function openNvimHandler(path: string) {
     await invoke("open_nvim", { path: path });
   }
 
-  async function openCodeHandler(path: string) {
+  async function openVSHandler(path: string) {
     await invoke("open_vs", { path: path });
   }
 
@@ -39,7 +58,9 @@ function App() {
         <InputModal type={inputModalType()} />
       </Show>
       <div class="flex gap-2 justify-center py-4 text-2xl border-b-2 border-secondary w-full">
-        <button class="bg-primary bg-opacity-50 px-4 py-2 rounded-md">
+        <button 
+          onClick={openMostRecent}
+          class="bg-primary bg-opacity-50 px-4 py-2 rounded-md">
           Open Most Recent
         </button>
         <button
@@ -48,22 +69,35 @@ function App() {
         >
           New Project
         </button>
-        <button class="bg-primary bg-opacity-50 px-4 py-2 rounded-md">
+        <button 
+          onClick={addFolderHandler}
+          class="bg-primary bg-opacity-50 px-4 py-2 rounded-md">
           Open Folder
         </button>
-        <button class="bg-primary bg-opacity-50 px-4 py-2 rounded-md">
+        <button 
+          onClick={() => openNvimHandler("C:\\Users\\Nather\\AppData\\Local\\nvim")}
+          class="bg-primary bg-opacity-50 px-4 py-2 rounded-md">
           Config
         </button>
       </div>
       <div class="w-full">
         <For each={allProjects()}>
           {(proj) => (
+            <div class="flex text-left w-full px-2 pl-4 py-4 bg-opacity-0 m-2 border-b-2 border-secondary">
+            <h2 class="text-3xl flex-1">{proj.name}</h2>
             <button
-              onClick={() => openNvimHandler(proj.path)}
-              class="text-2xl text-left w-full px-2 pl-4 py-4 bg-primary bg-opacity-0 m-2 border-b-2 border-secondary"
+              onClick={() => openProjectHandler("nvim", proj)}
+              class="text-2xl mx-4 bg-primary px-2 py-1 rounded-md hover:bg-opacity-50 transition-colors"
             >
-              {proj.name}
+              Nvim
             </button>
+            <button
+              onClick={() => openProjectHandler("vs", proj)}
+              class="text-2xl mx-4 bg-primary px-2 py-1 rounded-md hover:bg-opacity-50 transition-colors"
+            >
+              VS
+            </button>
+            </div>
           )}
         </For>
       </div>
