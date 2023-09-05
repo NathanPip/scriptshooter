@@ -137,11 +137,19 @@ function App() {
               onBlur={() => {
                 setFocusedProject(undefined);
               }}
-              class="flex text-left w-full px-2 pl-4 py-4 bg-opacity-0 m-2 shadow-[0_2px_3px_-1px_#737373] outline-none focus:translate-x-[4px] focus:border-l-[4px] focus:border-neutral-300 transition-all"
+              class="flex items-center text-left rounded-lg w-full px-2 pl-4 py-4 bg-opacity-0 m-2 shadow-[0_2px_3px_-1px_#737373] outline-none focus:translate-x-[4px] focus:border-l-[4px] focus:border-neutral-300 transition-all"
               tabIndex={0}
             >
-              <h2 class="text-3xl flex-1">{proj.name}</h2>
-              <button
+              <div class="flex-1">
+                <h2 class="text-3xl">{proj.name}</h2>
+                <p class="mr-2 text-sm text-neutral-500">last opened {proj.lastOpened > 0 ? new Date(proj.lastOpened).toLocaleDateString() : "never"}</p>
+              </div>
+              <div class={`mx-4 transition-opacity ${proj === focusedProject() ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
+                <button tabIndex={-1} class="py-1 px-1 text-sm rounded-md mx-1 shadow-[0_1px_3px_1px_#737373]">NV</button>
+                <button tabIndex={-1} class="py-1 px-1 text-sm rounded-md mx-1 shadow-[0_1px_3px_1px_#737373]">VS</button>
+              </div>
+              <p class="mr-2 text-neutral-500 italic">{proj.path}</p>
+              {/* <button
                 tabIndex={-1}
                 onClick={() => openProjectHandler("nvim", proj)}
                 class="text-2xl mx-4 bg-neutral-900 px-2 py-1 rounded-md hover:bg-opacity-50 transition-colors shadow-[0_1px_3px_1px_#737373]"
@@ -154,7 +162,7 @@ function App() {
                 class="text-2xl mx-4 bg-neutral-900 px-2 py-1 rounded-md hover:bg-opacity-50 transition-colors shadow-[0_1px_3px_1px_#737373]"
               >
                 VS
-              </button>
+              </button> */}
             </div>
           )}
         </For>
