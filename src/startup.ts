@@ -14,5 +14,6 @@ export async function initialStart() {
         await writeTextFile(`projects.json`, JSON.stringify([]), {dir: BaseDirectory.AppData});
     }
     const projects = await getProjectsData();
+    projects.sort((a, b) => { return b.lastOpened - a.lastOpened });
     setAllProjects(projects);
 }
