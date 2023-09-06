@@ -10,7 +10,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 import InputModal from "./components/InputModal";
 import { allProjects, setAllProjects } from "./state";
-import { initialStart, Project, saveProjectsData } from "./data";
+import { configStore, initialStart, Project, saveProjectsData } from "./data";
 import SettingsModal from "./components/SettingsModal";
 import InitializationScreen from "./components/InitializationScreen";
 import Main from "./components/Main";
@@ -35,11 +35,11 @@ export function openProjectHandler(ide: "vs" | "nvim", proj: Project) {
 }
 
 export async function openNvimHandler(path: string) {
-  await invoke("open_nvim", { path: path });
+  await invoke("open_nvim", {nvim: configStore.nvim, path: path });
 }
 
 export async function openVSHandler(path: string) {
-  await invoke("open_vs", { path: path });
+  await invoke("open_vs", { vs: configStore.vscode, path: path });
 }
 
 export const [initializationRan, setInitializationRan] = createSignal(false);

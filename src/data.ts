@@ -109,15 +109,16 @@ export async function initialStart() {
       { dir: BaseDirectory.AppData }
     );
     setHasInitialized(false);
-  } else {
-    setHasInitialized(true);
   } 
   const projects = await getProjectsData();
   const config = await getConfigData();
   for(let item of Object.keys(config)){
-    if(config[item] === ""){
-      setHasInitialized(false);
-      break;
+    if(config[item] !== ""){
+      const valid = await exists(config[item]);
+      if(valid){
+        setHasInitialized(true);
+        break;
+      }
     }
   }
   projects.sort((a, b) => {

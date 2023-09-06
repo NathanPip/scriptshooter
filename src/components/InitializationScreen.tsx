@@ -17,6 +17,8 @@ const InitializationScreen: Component = () => {
   const [nvimPathSet, setNvimPathSet] = createSignal(false);
   const [vsCodePathSet, setVsCodePathSet] = createSignal(false);
 
+  const [canContinue, setCanContinue] = createSignal(false);
+
   async function chooseDirectoryFromExplorer() {
     const path = await open({
       multiple: false,
@@ -54,15 +56,29 @@ const InitializationScreen: Component = () => {
     return path.endsWith("nvim.exe");
   }
 
+  function addSlashes(path: string) {
+    return path.replace(/\\/g, "\\\\");
+  }
+
+  async function continueButtonHandler() {
+    if(!nvimPathSet() && !vsCodePathSet()) return;
+    const configPath = configEl?.value ? addSlashes(configEl?.value) : "";
+    const nvimPath = nvimEl?.value ? addSlashes(nvimEl?.value) : "";
+    const vsCodePath = vsCodeEl?.value ? addSlashes(vsCodeEl?.value) : "";
+    setConfigStore({
+      config: configPath,
+      nvim: nvimPath,
+      vscode: vsCodePath,
+    });
+    await saveConfigData();
+    setHasInitialized(true);
+  }
+
   createEffect(async () => {
-    if (configPathSet() && nvimPathSet() && vsCodePathSet()) {
-        setConfigStore({
-            config: configEl?.value as string,
-            nvim: nvimEl?.value as string,
-            vscode: vsCodeEl?.value as string,
-        })
-        await saveConfigData();
-        setHasInitialized(true);
+    if(nvimPathSet() || vsCodePathSet()) {
+      setCanContinue(true);
+    } else if (!nvimPathSet() && !vsCodePathSet()) {
+      setCanContinue(false);
     }
   });
 
@@ -187,6 +203,19 @@ const InitializationScreen: Component = () => {
           }}
         ></input>
       </div>
+      <button
+      onClick={() => {
+        if(!canContinue()) return;
+        continueButtonHandler();
+      }}
+        class={`py-2 px-3 rounded-md text-xl mt-4 ${
+          canContinue()
+            ? "bg-neutral-800 text-neutral-300"
+            : "bg-neutral-900 text-neutral-700 pointer-events-none"
+        }`}
+      >
+        Continue
+      </button>
     </div>
   );
 };

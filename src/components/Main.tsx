@@ -1,51 +1,70 @@
-import { Component, For, createEffect, createSignal, onCleanup } from "solid-js";
-import { initializationRan, openProjectHandler, setInputModalType, setShowInputModal, setShowSettingsModal } from "../App";
+import {
+  Component,
+  For,
+  Show,
+  createEffect,
+  createSignal,
+  onCleanup,
+} from "solid-js";
+import {
+  initializationRan,
+  openNvimHandler,
+  openProjectHandler,
+  setInputModalType,
+  setShowInputModal,
+  setShowSettingsModal,
+} from "../App";
 import { allProjects } from "../state";
-import { Project } from "../data";
+import { Project, configStore } from "../data";
 
 const Main: Component = () => {
-
-    const [focusedProject, setFocusedProject] = createSignal<
+  const [focusedProject, setFocusedProject] = createSignal<
     Project | undefined
   >();
 
-    function addProjectHandler() {
-        setShowInputModal(true);
-        setInputModalType("new project");
-      }
-    
-      function addFolderHandler() {
-        setShowInputModal(true);
-        setInputModalType("new folder");
-      }
-    
-      function shortcutEventHandler(e: KeyboardEvent) {
-        if (e.key === "n" && e.ctrlKey) {
-          openProjectHandler("nvim", allProjects()[0]);
-          return;
-        }
-        if (e.key === "v" && e.ctrlKey) {
-          openProjectHandler("vs", allProjects()[0]);
-          return;
-        }
-        if (!focusedProject()) return;
-        if (e.key === "n") {
-          openProjectHandler("nvim", focusedProject() as Project);
-          return;
-        }
-        if (e.key === "v") {
-          openProjectHandler("vs", focusedProject() as Project);
-        }
-      }
-    
-      createEffect(() => {
-        if (!initializationRan()) return;
-        addEventListener("keydown", shortcutEventHandler);
-    
-        onCleanup(() => {
-          removeEventListener("keydown", shortcutEventHandler);
-        });
-      });
+  function addProjectHandler() {
+    setShowInputModal(true);
+    setInputModalType("new project");
+  }
+
+  function addFolderHandler() {
+    setShowInputModal(true);
+    setInputModalType("new folder");
+  }
+
+  function shortcutEventHandler(e: KeyboardEvent) {
+    if (e.key === "Escape") {
+      setShowInputModal(false);
+      setShowSettingsModal(false);
+      setFocusedProject(undefined);
+      return;
+    }
+    if (e.key === "n" && e.ctrlKey && configStore.nvim.length > 0) {
+      openProjectHandler("nvim", allProjects()[0]);
+      return;
+    }
+    if (e.key === "v" && e.ctrlKey && configStore.vscode.length > 0) {
+      openProjectHandler("vs", allProjects()[0]);
+      return;
+    }
+    if (!focusedProject()) return;
+    if (e.key === "n" && configStore.nvim.length > 0) {
+      openProjectHandler("nvim", focusedProject() as Project);
+      return;
+    }
+    if (e.key === "v" && configStore.vscode.length > 0) {
+      openProjectHandler("vs", focusedProject() as Project);
+    }
+  }
+
+  createEffect(() => {
+    if (!initializationRan()) return;
+    addEventListener("keydown", shortcutEventHandler);
+
+    onCleanup(() => {
+      removeEventListener("keydown", shortcutEventHandler);
+    });
+  });
 
   return (
     <>
@@ -99,7 +118,7 @@ const Main: Component = () => {
                 <p class="mr-2 text-sm text-neutral-500">
                   last opened{" "}
                   {proj.lastOpened > 0
-                    ? new Date(proj.lastOpened).toLocaleDateString()
+                    ? `${new Date(proj.lastOpened).toLocaleDateString()}`
                     : "never"}
                 </p>
               </div>
@@ -110,18 +129,28 @@ const Main: Component = () => {
                     : "opacity-0 pointer-events-none"
                 }`}
               >
-                <button
-                  tabIndex={-1}
-                  class="py-1 px-1 text-sm rounded-md mx-1 shadow-[0_1px_3px_1px_#737373]"
-                >
-                  NV
-                </button>
-                <button
-                  tabIndex={-1}
-                  class="py-1 px-1 text-sm rounded-md mx-1 shadow-[0_1px_3px_1px_#737373]"
-                >
-                  VS
-                </button>
+                <Show when={configStore.nvim.length > 0}>
+                  <button
+                    onClick={() => {
+                      openProjectHandler("nvim", proj);
+                    }}
+                    tabIndex={-1}
+                    class="py-1 px-1 text-sm rounded-md mx-1 shadow-[0_1px_3px_1px_#737373]"
+                  >
+                    NV
+                  </button>
+                </Show>
+                <Show when={configStore.vscode.length > 0}>
+                  <button
+                    onClick={() => {
+                      openProjectHandler("vs", proj);
+                    }}
+                    tabIndex={-1}
+                    class="py-1 px-1 text-sm rounded-md mx-1 shadow-[0_1px_3px_1px_#737373]"
+                  >
+                    VS
+                  </button>
+                </Show>
               </div>
               <p class="mr-2 text-neutral-500 italic">{proj.path}</p>
               {/* <button

@@ -11,8 +11,8 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-fn open_nvim(path: &str) {
-    Command::new("D:\\IDE_STUFF\\NeoVim\\bin\\nvim.exe")
+fn open_nvim(nvim: &str, path: &str) {
+    Command::new(nvim)
         .raw_arg(path)
         .current_dir(path)
         .creation_flags(0x00000010)
@@ -22,8 +22,8 @@ fn open_nvim(path: &str) {
 }
 
 #[tauri::command]
-fn open_vs(path: &str) {
-    Command::new("C:\\Microsoft VS Code\\Code.exe")
+fn open_vs(vs: &str, path: &str) {
+    Command::new(vs)
         .raw_arg(path)
         .current_dir(path)
         .creation_flags(0x00000010)
