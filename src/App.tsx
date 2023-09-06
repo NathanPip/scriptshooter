@@ -8,165 +8,62 @@ import {
 } from "solid-js";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
-import { initialStart } from "./startup";
 import InputModal from "./components/InputModal";
 import { allProjects, setAllProjects } from "./state";
-import { Project, saveProjectsData } from "./data";
+import { initialStart, Project, saveProjectsData } from "./data";
+import SettingsModal from "./components/SettingsModal";
+import InitializationScreen from "./components/InitializationScreen";
+import Main from "./components/Main";
 
 export const [showInputModal, setShowInputModal] = createSignal(false);
+export const [showSettingsModal, setShowSettingsModal] = createSignal(false);
 export const [inputModalType, setInputModalType] = createSignal("");
+export const [hasInitialized, setHasInitialized] = createSignal(false);
+
+export function openProjectHandler(ide: "vs" | "nvim", proj: Project) {
+  switch (ide) {
+    case "vs":
+      openVSHandler(proj.path);
+      break;
+    case "nvim":
+      openNvimHandler(proj.path);
+      break;
+  }
+  proj.lastOpened = Date.now();
+  setAllProjects((prev) => [proj, ...prev.filter((p) => p.path !== proj.path)]);
+  saveProjectsData();
+}
+
+export async function openNvimHandler(path: string) {
+  await invoke("open_nvim", { path: path });
+}
+
+export async function openVSHandler(path: string) {
+  await invoke("open_vs", { path: path });
+}
+
+export const [initializationRan, setInitializationRan] = createSignal(false);
 
 function App() {
-  const [initializationRan, setInitializationRan] = createSignal(false);
-  const [focusedProject, setFocusedProject] = createSignal<
-    Project | undefined
-  >();
-
   onMount(async () => {
     await initialStart();
     setInitializationRan(true);
   });
 
-  function addProjectHandler() {
-    setShowInputModal(true);
-    setInputModalType("new project");
-  }
-
-  function addFolderHandler() {
-    setShowInputModal(true);
-    setInputModalType("new folder");
-  }
-
-  function openProjectHandler(ide: "vs" | "nvim", proj: Project) {
-    switch (ide) {
-      case "vs":
-        openVSHandler(proj.path);
-        break;
-      case "nvim":
-        openNvimHandler(proj.path);
-        break;
-    }
-    proj.lastOpened = Date.now();
-    setAllProjects((prev) => [
-      proj,
-      ...prev.filter((p) => p.path !== proj.path),
-    ]);
-    saveProjectsData();
-  }
-
-  async function openNvimHandler(path: string) {
-    await invoke("open_nvim", { path: path });
-  }
-
-  async function openVSHandler(path: string) {
-    await invoke("open_vs", { path: path });
-  }
-
-  function shortcutEventHandler(e: KeyboardEvent) {
-    if (e.key === "n" && e.ctrlKey) {
-      openProjectHandler("nvim", allProjects()[0]);
-      return;
-    }
-    if (e.key === "v" && e.ctrlKey) {
-      openProjectHandler("vs", allProjects()[0]);
-      return;
-    }
-    if (!focusedProject()) return;
-    if (e.key === "n") {
-      openProjectHandler("nvim", focusedProject() as Project);
-      return;
-    }
-    if (e.key === "v") {
-      openProjectHandler("vs", focusedProject() as Project);
-    }
-  }
-
-  createEffect(() => {
-    if (!initializationRan()) return;
-    addEventListener("keydown", shortcutEventHandler);
-
-    onCleanup(() => {
-      removeEventListener("keydown", shortcutEventHandler);
-    });
-  });
-
   return (
     <div class="w-full min-h-screen overflow-hidden">
-      <Show when={showInputModal() === true}>
+      <Show when={showInputModal()}>
         <InputModal type={inputModalType()} />
       </Show>
-      <div class="flex gap-4 justify-start px-2 my-4 text-lg w-full ">
-        <button
-          tabIndex={-1}
-          onClick={() => openProjectHandler("nvim", allProjects()[0])}
-          class="px-2 py-1 rounded-lg hover:bg-opacity-50 shadow-[0_1px_3px_1px_#737373] bg-neutral-900 shadow-secondary transition-colors"
-        >
-          Open Most Recent
-        </button>
-        <button
-          tabIndex={-1}
-          onClick={addProjectHandler}
-          class="px-2 py-1 rounded-lg hover:bg-opacity-50 shadow-[0_1px_3px_1px_#737373] bg-neutral-900 shadow-secondary transition-colors"
-        >
-          New Project
-        </button>
-        <button
-          tabIndex={-1}
-          onClick={addFolderHandler}
-          class="px-2 py-1 rounded-lg hover:bg-opacity-50 shadow-[0_1px_3px_1px_#737373] bg-neutral-900 shadow-secondary transition-colors"
-        >
-          Open Folder
-        </button>
-        <button
-          tabIndex={-1}
-          onClick={() =>
-            openNvimHandler("C:\\Users\\Nather\\AppData\\Local\\nvim")
-          }
-          class="px-2 py-1 rounded-lg hover:bg-opacity-50 shadow-[0_1px_3px_1px_#737373] bg-neutral-900 shadow-secondary transition-colors"
-        >
-          Config
-        </button>
-      </div>
-      <div class="w-full">
-        <For each={allProjects()}>
-          {(proj) => (
-            <div
-              onFocus={() => {
-                setFocusedProject(proj);
-              }}
-              onBlur={() => {
-                setFocusedProject(undefined);
-              }}
-              class="flex items-center text-left rounded-lg w-full px-2 pl-4 py-4 bg-opacity-0 m-2 shadow-[0_2px_3px_-1px_#737373] outline-none focus:translate-x-[4px] focus:border-l-[4px] focus:border-neutral-300 transition-all"
-              tabIndex={0}
-            >
-              <div class="flex-1">
-                <h2 class="text-3xl">{proj.name}</h2>
-                <p class="mr-2 text-sm text-neutral-500">last opened {proj.lastOpened > 0 ? new Date(proj.lastOpened).toLocaleDateString() : "never"}</p>
-              </div>
-              <div class={`mx-4 transition-opacity ${proj === focusedProject() ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
-                <button tabIndex={-1} class="py-1 px-1 text-sm rounded-md mx-1 shadow-[0_1px_3px_1px_#737373]">NV</button>
-                <button tabIndex={-1} class="py-1 px-1 text-sm rounded-md mx-1 shadow-[0_1px_3px_1px_#737373]">VS</button>
-              </div>
-              <p class="mr-2 text-neutral-500 italic">{proj.path}</p>
-              {/* <button
-                tabIndex={-1}
-                onClick={() => openProjectHandler("nvim", proj)}
-                class="text-2xl mx-4 bg-neutral-900 px-2 py-1 rounded-md hover:bg-opacity-50 transition-colors shadow-[0_1px_3px_1px_#737373]"
-              >
-                Nvim
-              </button>
-              <button
-                tabIndex={-1}
-                onClick={() => openProjectHandler("vs", proj)}
-                class="text-2xl mx-4 bg-neutral-900 px-2 py-1 rounded-md hover:bg-opacity-50 transition-colors shadow-[0_1px_3px_1px_#737373]"
-              >
-                VS
-              </button> */}
-            </div>
-          )}
-        </For>
-      </div>
+      <Show when={showSettingsModal()}>
+        <SettingsModal />
+      </Show>
+      <Show when={!hasInitialized()}>
+        <InitializationScreen />
+      </Show>
+      <Show when={hasInitialized()}>
+        <Main />
+      </Show>
     </div>
   );
 }

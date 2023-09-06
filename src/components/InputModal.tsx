@@ -58,7 +58,7 @@ const InputModal: Component<{ type: string }> = (props) => {
   })
 
   return (
-    <div class="w-full h-screen bg-opacity-80 bg-background flex justify-center items-center absolute">
+    <div class="w-full h-screen bg-opacity-80 bg-neutral-900 flex justify-center items-center absolute">
       <div class="w-1/2 flex relative">
         <button onClick={() => setShowInputModal(false)} class="absolute right-0 top-0 -m-10 px-2 py-1 rounded-md text-xl hover:bg-opacity-50">
           X
