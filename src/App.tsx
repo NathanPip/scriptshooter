@@ -34,7 +34,7 @@ export function openProjectHandler(ide: "vs" | "nvim", proj: Project) {
 }
 
 export async function openNvimHandler(path: string) {
-  await invoke("open_nvim", {nvim: configStore.nvim, path: path });
+  await invoke("open_nvim", { nvim: configStore.nvim, path: path });
 }
 
 export async function openVSHandler(path: string) {
@@ -51,17 +51,19 @@ function App() {
 
   return (
     <div class="w-full min-h-screen overflow-hidden">
-      <Show when={showInputModal()}>
-        <InputModal type={inputModalType()} />
-      </Show>
-      <Show when={showSettingsModal()}>
-        <SettingsModal />
-      </Show>
-      <Show when={!hasInitialized()}>
-        <InitializationScreen />
-      </Show>
-      <Show when={hasInitialized()}>
-        <Main />
+      <Show when={initializationRan()} fallback={"loading"}>
+        <Show when={showInputModal()}>
+          <InputModal type={inputModalType()} />
+        </Show>
+        <Show when={showSettingsModal()}>
+          <SettingsModal />
+        </Show>
+        <Show when={!hasInitialized()}>
+          <InitializationScreen />
+        </Show>
+        <Show when={hasInitialized()}>
+          <Main />
+        </Show>
       </Show>
     </div>
   );

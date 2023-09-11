@@ -10,6 +10,7 @@ import { allProjects, setAllProjects } from "./state";
 import { appDataDir } from "@tauri-apps/api/path";
 import { setHasInitialized } from "./App";
 import { createStore } from "solid-js/store";
+import { createEffect } from "solid-js";
 
 export type Project = {
   name: string;

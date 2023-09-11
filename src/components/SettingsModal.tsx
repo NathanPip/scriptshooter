@@ -1,6 +1,6 @@
 import { Component, createEffect, createSignal } from "solid-js";
 import { openNvimHandler, setShowSettingsModal } from "../App";
-import { configStore, setConfigStore } from "../data";
+import { configStore, saveConfigData, setConfigStore } from "../data";
 import { PathInput } from "./InitializationScreen";
 
 const SettingsModal: Component = () => {
@@ -81,6 +81,7 @@ const SettingsModal: Component = () => {
             disabled={!canSetNvimConfigPath()}
             onClick={() => {
               setConfigStore("config", nvimConfigPath());
+              saveConfigData();
               setHasSetNvimConfigPath(true);
             }}
           >
@@ -111,6 +112,7 @@ const SettingsModal: Component = () => {
             disabled={!canSetNvimPath()}
             onClick={() => {
               setConfigStore("nvim", nvimPath());
+              saveConfigData();
               setHasSetNvimPath(true);
             }}
           >
@@ -141,6 +143,7 @@ const SettingsModal: Component = () => {
             disabled={!canSetVsCodePath()}
             onClick={() => {
               setConfigStore("vscode", vsCodePath());
+              saveConfigData();
               setHasSetVsCodePath(true);
             }}
           >
