@@ -1,8 +1,106 @@
 import { open } from "@tauri-apps/api/dialog";
 import { exists } from "@tauri-apps/api/fs";
-import { Component, createEffect, createSignal } from "solid-js";
+import { Component, Setter, createEffect, createSignal } from "solid-js";
 import { saveConfigData, setConfigStore } from "../data";
 import { setHasInitialized } from "../App";
+
+export const PathInput: Component<{
+  setter: Setter<string>;
+  defaultValue?: string;
+  placeholder?: string;
+  directory?: boolean;
+  endsWith?: string;
+}> = (props) => {
+  const [error, setError] = createSignal(false);
+  const [validPath, setValidPath] = createSignal("");
+
+  let inputElement: HTMLInputElement | undefined = undefined;
+
+  async function chooseDirectoryFromExplorer() {
+    const path = await open({
+      multiple: false,
+      directory: true,
+    });
+    if (path === null) return undefined;
+    if (path.length <= 0) return undefined;
+    return path as string;
+  }
+
+  async function chooseFileFromExplorer() {
+    const path = await open({
+      multiple: false,
+      directory: false,
+    });
+    if (path === null) return;
+    if (path.length <= 0) return;
+    return path as string;
+  }
+
+  const validateEntry = async (path: string) => {
+    const result = await exists(path);
+    if (!result) {
+      return false;
+    }
+    if (props.endsWith) {
+      return path.endsWith(props.endsWith);
+    }
+    return true;
+  };
+
+  createEffect(() => {
+    if (validPath()) {
+      props.setter(validPath());
+    } else {
+      props.setter("");
+    }
+  });
+
+  const pathChangeHandler = async (path: string) => {
+    const valid = await validateEntry(path);
+    if (!valid) {
+      setError(true);
+      setValidPath("");
+      return;
+    } else {
+      setError(false);
+      path.replace(/\\/g, "\\\\");
+      setValidPath(path);
+      return;
+    }
+  };
+
+  const chooseFromExplorerHandler = async () => {
+    let path: string | undefined;
+    if (props.directory) {
+      path = await chooseDirectoryFromExplorer();
+    } else {
+      path = await chooseFileFromExplorer();
+    }
+    if (path) {
+      if (!inputElement) return;
+      inputElement.value = path;
+      await pathChangeHandler(path);
+    }
+  };
+
+  return (
+    <div class="my-2 flex items-center">
+      <button onClick={chooseFromExplorerHandler}>
+        <img class="w-6 h-6" src="../../folder.svg" />
+      </button>
+      <input
+        class={`ml-2 py-2 px-3 flex-1 tracking-wider bg-neutral-900 
+          ${error() ? "border-2 border-red-500" : ""} 
+          ${validPath() ? "border-2 border-green-300" : ""}
+        }`}
+        ref={inputElement}
+        placeholder={props.placeholder ?? "Enter Path"}
+        onChange={() => pathChangeHandler(inputElement?.value ?? "")}
+        value={props.defaultValue ?? ""}
+      ></input>
+    </div>
+  );
+};
 
 const InitializationScreen: Component = () => {
   let configEl: HTMLInputElement | undefined;
@@ -61,7 +159,7 @@ const InitializationScreen: Component = () => {
   }
 
   async function continueButtonHandler() {
-    if(!nvimPathSet() && !vsCodePathSet()) return;
+    if (!nvimPathSet() && !vsCodePathSet()) return;
     const configPath = configEl?.value ? addSlashes(configEl?.value) : "";
     const nvimPath = nvimEl?.value ? addSlashes(nvimEl?.value) : "";
     const vsCodePath = vsCodeEl?.value ? addSlashes(vsCodeEl?.value) : "";
@@ -75,7 +173,7 @@ const InitializationScreen: Component = () => {
   }
 
   createEffect(async () => {
-    if(nvimPathSet() || vsCodePathSet()) {
+    if (nvimPathSet() || vsCodePathSet()) {
       setCanContinue(true);
     } else if (!nvimPathSet() && !vsCodePathSet()) {
       setCanContinue(false);
@@ -204,10 +302,10 @@ const InitializationScreen: Component = () => {
         ></input>
       </div>
       <button
-      onClick={() => {
-        if(!canContinue()) return;
-        continueButtonHandler();
-      }}
+        onClick={() => {
+          if (!canContinue()) return;
+          continueButtonHandler();
+        }}
         class={`py-2 px-3 rounded-md text-xl mt-4 ${
           canContinue()
             ? "bg-neutral-800 text-neutral-300"

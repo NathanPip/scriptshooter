@@ -7,7 +7,6 @@ import {
   onMount,
 } from "solid-js";
 import { invoke } from "@tauri-apps/api/tauri";
-import "./App.css";
 import InputModal from "./components/InputModal";
 import { allProjects, setAllProjects } from "./state";
 import { configStore, initialStart, Project, saveProjectsData } from "./data";

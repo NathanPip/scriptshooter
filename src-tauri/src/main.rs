@@ -18,7 +18,6 @@ fn open_nvim(nvim: &str, path: &str) {
         .creation_flags(0x00000010)
         .spawn()
         .expect("failed to open nvim");
-    println!("{:?}", whoami::username());
 }
 
 #[tauri::command]
