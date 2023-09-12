@@ -63,7 +63,6 @@ export const PathInput: Component<{
       return;
     } else {
       setError(false);
-      path.replace(/\\/g, "\\\\");
       setValidPath(path);
       return;
     }
@@ -154,15 +153,15 @@ const InitializationScreen: Component = () => {
     return path.endsWith("nvim.exe");
   }
 
-  function addSlashes(path: string) {
-    return path.replace(/\\/g, "\\\\");
-  }
+  // function addSlashes(path: string) {
+  //   return path.replace(/\\/g, "\\\\");
+  // }
 
   async function continueButtonHandler() {
     if (!nvimPathSet() && !vsCodePathSet()) return;
-    const configPath = configEl?.value ? addSlashes(configEl?.value) : "";
-    const nvimPath = nvimEl?.value ? addSlashes(nvimEl?.value) : "";
-    const vsCodePath = vsCodeEl?.value ? addSlashes(vsCodeEl?.value) : "";
+    const configPath = configEl?.value ? configEl?.value : "";
+    const nvimPath = nvimEl?.value ? nvimEl?.value : "";
+    const vsCodePath = vsCodeEl?.value ? vsCodeEl?.value : "";
     setConfigStore({
       config: configPath,
       nvim: nvimPath,

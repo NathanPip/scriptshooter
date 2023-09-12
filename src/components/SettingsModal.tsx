@@ -19,7 +19,7 @@ const SettingsModal: Component = () => {
   createEffect(() => {
     if (
       nvimPath().length > 0 &&
-      nvimPath() !== removeDoubleSlashes(configStore.nvim)
+      nvimPath() !== configStore.nvim
     ) {
       setCanSetNvimPath(true);
     } else {
@@ -30,7 +30,7 @@ const SettingsModal: Component = () => {
   createEffect(() => {
     if (
       nvimConfigPath().length > 0 &&
-      nvimConfigPath() !== removeDoubleSlashes(configStore.config)
+      nvimConfigPath() !== configStore.config
     ) {
       setCanSetNvimConfigPath(true);
     } else {
@@ -41,17 +41,13 @@ const SettingsModal: Component = () => {
   createEffect(() => {
     if (
       vsCodePath().length > 0 &&
-      vsCodePath() !== removeDoubleSlashes(configStore.vscode)
+      vsCodePath() !== configStore.vscode
     ) {
       setCanSetVsCodePath(true);
     } else {
       setCanSetVsCodePath(false);
     }
   });
-
-  const removeDoubleSlashes = (path: string) => {
-    return path.replace(/\\\\/g, "\\");
-  };
 
   return (
     <div class="w-full min-h-screen bg-neutral-950 flex flex-col items-center absolute z-10">
@@ -69,7 +65,7 @@ const SettingsModal: Component = () => {
               setter={setNvimConfigPath}
               placeholder={"set Path to Neovim config directory"}
               directory={true}
-              defaultValue={removeDoubleSlashes(configStore.config)}
+              defaultValue={configStore.config}
             ></PathInput>
           </div>
           <button
@@ -100,7 +96,7 @@ const SettingsModal: Component = () => {
               setter={setNvimPath}
               placeholder={"set Path to Neovim.exe"}
               endsWith={"nvim.exe"}
-              defaultValue={removeDoubleSlashes(configStore.nvim)}
+              defaultValue={configStore.nvim}
             ></PathInput>
           </div>
           <button
@@ -131,7 +127,7 @@ const SettingsModal: Component = () => {
               setter={setVsCodePath}
               placeholder={"set Path to Code.exe"}
               endsWith={"Code.exe"}
-              defaultValue={removeDoubleSlashes(configStore.vscode)}
+              defaultValue={configStore.vscode}
             ></PathInput>
           </div>
           <button
