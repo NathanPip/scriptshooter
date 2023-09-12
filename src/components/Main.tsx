@@ -8,6 +8,7 @@ import {
 } from "solid-js";
 import {
   initializationRan,
+  openCMD,
   openProjectHandler,
   setInputModalType,
   setShowInputModal,
@@ -46,6 +47,9 @@ const Main: Component = () => {
       openProjectHandler("vs", allProjects()[0]);
       return;
     }
+    if(e.key === "c" && e.ctrlKey) {
+      openCMD(allProjects()[0].path as string);
+    }
     if (!focusedProject()) return;
     if (e.key === "n" && configStore.nvim.length > 0) {
       openProjectHandler("nvim", focusedProject() as Project);
@@ -53,6 +57,9 @@ const Main: Component = () => {
     }
     if (e.key === "v" && configStore.vscode.length > 0) {
       openProjectHandler("vs", focusedProject() as Project);
+    }
+    if(e.key === "c") {
+      openCMD(focusedProject()?.path as string);
     }
   }
 
@@ -106,10 +113,10 @@ const Main: Component = () => {
               onFocus={() => {
                 setFocusedProject(proj);
               }}
-              class={`flex items-center text-left rounded-lg w-full px-2 pl-4 py-4 bg-opacity-0 m-2 shadow-[0_2px_3px_-1px_#737373] outline-none transition-all ${
+              class={`flex items-center text-left rounded-lg w-full px-2 pl-4 py-4 bg-opacity-0 m-2 outline-none transition-all ${
                 focusedProject() == proj
-                  ? "translate-x-[4px] shadow-[-4px_2px_3px_-1px_#737373] border-neutral-300"
-                  : ""
+                  ? "translate-x-[4px] shadow-[-4px_2px_3px_-1px_#737373]"
+                  : "shadow-[0_2px_3px_-1px_#737373]"
               }`}
               tabIndex={0}
             >
@@ -151,6 +158,15 @@ const Main: Component = () => {
                     VS
                   </button>
                 </Show>
+                <button
+                  onClick={() => {
+                    openCMD(proj.path as string);
+                  }}
+                  tabIndex={-1}
+                  class="py-1 px-1 text-sm rounded-md mx-1 shadow-[0_1px_3px_1px_#737373]"
+                >
+                  CL
+                </button>
               </div>
               <p class="mr-2 text-neutral-500 italic">{proj.path}</p>
             </div>

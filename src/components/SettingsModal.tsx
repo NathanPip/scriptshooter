@@ -54,10 +54,10 @@ const SettingsModal: Component = () => {
   };
 
   return (
-    <div class="w-full h-screen bg-neutral-950 flex flex-col items-center absolute z-10">
+    <div class="w-full min-h-screen bg-neutral-950 flex flex-col items-center absolute z-10">
       <button
         onClick={() => setShowSettingsModal(false)}
-        class="absolute right-0 top-0 m-6 text-lg"
+        class="absolute right-0 top-0 m-4 text-xl w-6 h-6"
       >
         X
       </button>
@@ -169,7 +169,7 @@ const SettingsModal: Component = () => {
           Edit NVIM config
         </button>
       </div>
-        <div class="w-3/4 flex flex-col items-center text-neutral-600 mt-6">
+        <div class="w-3/4 flex flex-col items-center text-neutral-600 my-8">
           <h3 class="text-center text-2xl mb-2 font-semibold">Controls</h3>
           <ul class="">
             <li class="mt-2">
@@ -177,6 +177,9 @@ const SettingsModal: Component = () => {
             </li>
             <li class="mt-2">
               <span class="font-semibold">v: </span>Open's the currently selected project using VSCode
+            </li>
+            <li class="mt-2">
+              <span class="font-semibold">c: </span>Open's a command line window at the currently selected project
             </li>
             <li class="mt-2">
               <span class="font-semibold">CTRL + n: </span>Open's the most recently opened project
@@ -187,7 +190,10 @@ const SettingsModal: Component = () => {
               using VSCode
             </li>
             <li class="mt-2">
-              <span class="font-semibold">ESCAPE\\BACKSPACE: </span>Closes any menus and/or deselects
+              <span class="font-semibold">CTRL + c: </span>Open's a command line window at the most recently opened project
+            </li>
+            <li class="mt-2">
+              <span class="font-semibold">ESCAPE: </span>Closes any menus and/or deselects
               currently selected project
             </li>
           </ul>

@@ -30,9 +30,19 @@ fn open_vs(vs: &str, path: &str) {
         .expect("failed to open vscode");
 }
 
+#[tauri::command]
+fn open_cmd(path: &str) {
+    Command::new("cmd")
+    .raw_arg(path)
+    .current_dir(path)
+    .creation_flags(0x00000010)
+    .spawn()
+    .expect("failed to open cmd");
+}
+
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, open_nvim, open_vs])
+        .invoke_handler(tauri::generate_handler![greet, open_nvim, open_vs, open_cmd])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

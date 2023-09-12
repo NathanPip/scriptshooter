@@ -33,6 +33,11 @@ export function openProjectHandler(ide: "vs" | "nvim", proj: Project) {
   saveProjectsData();
 }
 
+export async function openCMD(path: string | undefined) {
+  if(!path) return;
+  await invoke("open_cmd", { path: path });
+}
+
 export async function openNvimHandler(path: string) {
   await invoke("open_nvim", { nvim: configStore.nvim, path: path });
 }
