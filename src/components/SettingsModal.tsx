@@ -54,7 +54,7 @@ const SettingsModal: Component = () => {
   };
 
   return (
-    <div class="w-full h-screen bg-neutral-950 flex justify-center absolute">
+    <div class="w-full h-screen bg-neutral-950 flex flex-col items-center absolute z-10">
       <button
         onClick={() => setShowSettingsModal(false)}
         class="absolute right-0 top-0 m-6 text-lg"
@@ -169,6 +169,29 @@ const SettingsModal: Component = () => {
           Edit NVIM config
         </button>
       </div>
+        <div class="w-3/4 flex flex-col items-center text-neutral-600 mt-6">
+          <h3 class="text-center text-2xl mb-2 font-semibold">Controls</h3>
+          <ul class="">
+            <li class="mt-2">
+              <span class="font-semibold">n: </span>Open's the currently selected project using Neovim
+            </li>
+            <li class="mt-2">
+              <span class="font-semibold">v: </span>Open's the currently selected project using VSCode
+            </li>
+            <li class="mt-2">
+              <span class="font-semibold">CTRL + n: </span>Open's the most recently opened project
+              using Neovim
+            </li>
+            <li class="mt-2">
+              <span class="font-semibold">CTRL + v: </span>Open's the most recently opened project
+              using VSCode
+            </li>
+            <li class="mt-2">
+              <span class="font-semibold">ESCAPE\\BACKSPACE: </span>Closes any menus and/or deselects
+              currently selected project
+            </li>
+          </ul>
+        </div>
     </div>
   );
 };

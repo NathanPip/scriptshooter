@@ -8,7 +8,6 @@ import {
 } from "solid-js";
 import {
   initializationRan,
-  openNvimHandler,
   openProjectHandler,
   setInputModalType,
   setShowInputModal,
@@ -68,7 +67,7 @@ const Main: Component = () => {
 
   return (
     <>
-      <div class="flex gap-4 justify-start px-2 my-4 text-lg w-full ">
+      <div class="flex gap-4 justify-center px-2 my-4 text-lg w-full">
         <button
           tabIndex={-1}
           onClick={() => openProjectHandler("nvim", allProjects()[0])}
@@ -95,7 +94,7 @@ const Main: Component = () => {
           onClick={() => {
             setShowSettingsModal((prev) => !prev);
           }}
-          class="ml-auto shadow-secondary transition-colors"
+          class="absolute right-0 mr-2 shadow-secondary transition-colors"
         >
           <img class="w-8 h-8" src="../../cog.svg" />
         </button>
@@ -107,10 +106,11 @@ const Main: Component = () => {
               onFocus={() => {
                 setFocusedProject(proj);
               }}
-              onBlur={() => {
-                setFocusedProject(undefined);
-              }}
-              class="flex items-center text-left rounded-lg w-full px-2 pl-4 py-4 bg-opacity-0 m-2 shadow-[0_2px_3px_-1px_#737373] outline-none focus:translate-x-[4px] focus:border-l-[4px] focus:border-neutral-300 transition-all"
+              class={`flex items-center text-left rounded-lg w-full px-2 pl-4 py-4 bg-opacity-0 m-2 shadow-[0_2px_3px_-1px_#737373] outline-none transition-all ${
+                focusedProject() == proj
+                  ? "translate-x-[4px] shadow-[-4px_2px_3px_-1px_#737373] border-neutral-300"
+                  : ""
+              }`}
               tabIndex={0}
             >
               <div class="flex-1">
@@ -153,20 +153,6 @@ const Main: Component = () => {
                 </Show>
               </div>
               <p class="mr-2 text-neutral-500 italic">{proj.path}</p>
-              {/* <button
-                tabIndex={-1}
-                onClick={() => openProjectHandler("nvim", proj)}
-                class="text-2xl mx-4 bg-neutral-900 px-2 py-1 rounded-md hover:bg-opacity-50 transition-colors shadow-[0_1px_3px_1px_#737373]"
-              >
-                Nvim
-              </button>
-              <button
-                tabIndex={-1}
-                onClick={() => openProjectHandler("vs", proj)}
-                class="text-2xl mx-4 bg-neutral-900 px-2 py-1 rounded-md hover:bg-opacity-50 transition-colors shadow-[0_1px_3px_1px_#737373]"
-              >
-                VS
-              </button> */}
             </div>
           )}
         </For>
