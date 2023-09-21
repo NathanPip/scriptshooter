@@ -16,7 +16,6 @@ import {
 } from "../App";
 import { allProjects } from "../state";
 import { Project, configStore } from "../data";
-import Dropdown from "./Dropdown";
 import AddDropdown from "./AddDropdown";
 
 export function addProjectHandler() {
@@ -96,16 +95,17 @@ const Main: Component = () => {
                     <img class="w-8 h-8" src="../../cog.svg" />
                 </button>
             </div>
-            <div class="w-full mt-8">
+            <div class="w-full mt-12">
+            <h1 class="text-2xl ml-4">Projects</h1>
                 <For each={allProjects()}>
                     {(proj) => (
                         <div
                             onFocus={() => {
                                 setFocusedProject(proj);
                             }}
-                            class={`flex items-center text-left rounded-lg w-full px-2 pl-4 py-4 bg-opacity-0 m-2 outline-none transition-all ${focusedProject() == proj
-                                    ? "translate-x-[4px] shadow-[-4px_2px_3px_-1px_#737373]"
-                                    : "shadow-[0_2px_3px_-1px_#737373]"
+                            class={`flex border-neutral-900 border-2 items-center text-left rounded-lg w-full px-2 pl-4 py-4 bg-opacity-0 m-2 my-4 outline-none transition-transform ${focusedProject() == proj
+                                    ? "translate-x-[4px] border-neutral-900 border-2"
+                                    : "border-neutral-900 border-2"
                                 }`}
                             tabIndex={0}
                         >
