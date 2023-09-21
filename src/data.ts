@@ -18,10 +18,24 @@ export type Project = {
   lastOpened: number;
 };
 
+export type TKeymap = {
+    first: {single: string, multi?: string},
+    second?: {single: string, multi?: string},
+}
+
 export const [configStore, setConfigStore] = createStore({
   config: "",
   nvim: "",
   vscode: "",
+  keymaps: {
+    open_recent_nvim: {first: {single: "Ctrl", multi: "n"}},
+    open_recent_vs: {first: {single: "Ctrl", multi: "v"}},
+    open_recent_cl: {first: {single: "Ctrl", multi: "c"}},
+    open_nvim: {first: {single: "n", multi: undefined}},
+    open_vs: {first: {single: "v", multi: undefined}},
+    open_cl: {first: {single: "c", multi: undefined}},
+    close: {first: {single: "Escape", multi: undefined}},
+  }
 });
 
 export async function saveProjectsData() {
@@ -106,7 +120,7 @@ export async function initialStart() {
   if (!hasConfig) {
     await writeTextFile(
       "config.json",
-      JSON.stringify({ config: "", nvim: "", vscode: "" }),
+      JSON.stringify(configStore),
       { dir: BaseDirectory.AppData }
     );
     setHasInitialized(false);

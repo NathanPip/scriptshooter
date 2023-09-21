@@ -1,10 +1,10 @@
 import {
-  For,
-  Show,
-  createEffect,
-  createSignal,
-  onCleanup,
-  onMount,
+    For,
+    Show,
+    createEffect,
+    createSignal,
+    onCleanup,
+    onMount,
 } from "solid-js";
 import { invoke } from "@tauri-apps/api/tauri";
 import InputModal from "./components/InputModal";
@@ -20,58 +20,58 @@ export const [inputModalType, setInputModalType] = createSignal("");
 export const [hasInitialized, setHasInitialized] = createSignal(false);
 
 export function openProjectHandler(ide: "vs" | "nvim", proj: Project) {
-  switch (ide) {
-    case "vs":
-      openVSHandler(proj.path);
-      break;
-    case "nvim":
-      openNvimHandler(proj.path);
-      break;
-  }
-  proj.lastOpened = Date.now();
-  setAllProjects((prev) => [proj, ...prev.filter((p) => p.path !== proj.path)]);
-  saveProjectsData();
+    switch (ide) {
+        case "vs":
+            openVSHandler(proj.path);
+            break;
+        case "nvim":
+            openNvimHandler(proj.path);
+            break;
+    }
+    proj.lastOpened = Date.now();
+    setAllProjects((prev) => [proj, ...prev.filter((p) => p.path !== proj.path)]);
+    saveProjectsData();
 }
 
 export async function openCMD(path: string | undefined) {
-  if(!path) return;
-  await invoke("open_cmd", { path: path });
+    if (!path) return;
+    await invoke("open_cmd", { path: path });
 }
 
 export async function openNvimHandler(path: string) {
-  await invoke("open_nvim", { nvim: configStore.nvim, path: path });
+    await invoke("open_nvim", { nvim: configStore.nvim, path: path });
 }
 
 export async function openVSHandler(path: string) {
-  await invoke("open_vs", { vs: configStore.vscode, path: path });
+    await invoke("open_vs", { vs: configStore.vscode, path: path });
 }
 
 export const [initializationRan, setInitializationRan] = createSignal(false);
 
 function App() {
-  onMount(async () => {
-    await initialStart();
-    setInitializationRan(true);
-  });
+    onMount(async () => {
+        await initialStart();
+        setInitializationRan(true);
+    });
 
-  return (
-    <div class="w-full min-h-screen overflow-hidden">
-      <Show when={initializationRan()} fallback={"loading"}>
-        <Show when={showInputModal()}>
-          <InputModal type={inputModalType()} />
-        </Show>
-        <Show when={showSettingsModal()}>
-          <SettingsModal />
-        </Show>
-        <Show when={!hasInitialized()}>
-          <InitializationScreen />
-        </Show>
-        <Show when={hasInitialized()}>
-          <Main />
-        </Show>
-      </Show>
-    </div>
-  );
+    return (
+        <div class="w-full min-h-screen overflow-hidden">
+            <Show when={hasInitialized()}>
+                <Main />
+            </Show>
+            <Show when={initializationRan()} fallback={"loading"}>
+                <Show when={showInputModal()}>
+                    <InputModal type={inputModalType()} />
+                </Show>
+                <Show when={showSettingsModal()}>
+                    <SettingsModal />
+                </Show>
+                <Show when={!hasInitialized()}>
+                    <InitializationScreen />
+                </Show>
+            </Show>
+        </div>
+    );
 }
 
 export default App;
