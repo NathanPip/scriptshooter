@@ -85,9 +85,9 @@ const ProjectListItem: Component<{ proj: Project }> = (props) => {
                 <Elipsis />
             </button>
             <Show when={showMenu()}>
-                <div class="absolute z-10 w-24 -top-full right-0 mt-8 mr-2 bg-neutral-950 rounded-lg shadow-[-4px_0px_20px_-7px_#022c22]">
+                            <div class="absolute -top-12 z-10 w-24 right-0 py-2 mr-2 bg-neutral-950 rounded-lg shadow-[-4px_0px_20px_-7px_#022c22]">
                     {/*<button class="px-2 py-1 w-full text-left hover:bg-neutral-900 rounded-t-lg">Rename</button>*/}
-                    <button onClick={() => {deleteProjectHandler(props.proj)}} class="px-2 py-1 w-full text-left hover:bg-neutral-900">Delete</button>
+                    <button onClick={() => { deleteProjectHandler(props.proj) }} class="px-2 py-1 w-full text-left hover:bg-neutral-900">Delete</button>
                 </div>
             </Show>
             <div>

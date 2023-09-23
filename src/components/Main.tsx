@@ -20,6 +20,7 @@ import AddDropdown from "./AddDropdown";
 import ProjectList from "./ProjectList";
 import Cog from "../icons/cog";
 import ProjectListItem from "./ProjectListItem";
+import OpenDropdown from "./OpenDropdown";
 
 export function addProjectHandler() {
     setShowInputModal(true);
@@ -81,8 +82,7 @@ const Main: Component = () => {
         <div class="h-screen overflow-hidden">
             <div class="flex gap-4 mx-3 my-2 text-lg w-full max-h-[20%]">
                 <AddDropdown />
-                <AddDropdown />
-                <AddDropdown />
+                <OpenDropdown />
                 <button
                     tabIndex={-1}
                     onClick={() => {
