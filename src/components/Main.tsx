@@ -18,6 +18,8 @@ import { allProjects } from "../state";
 import { Project, configStore } from "../data";
 import AddDropdown from "./AddDropdown";
 import ProjectList from "./ProjectList";
+import Cog from "../icons/cog";
+import ProjectListItem from "./ProjectListItem";
 
 export function addProjectHandler() {
     setShowInputModal(true);
@@ -29,10 +31,11 @@ export function addFolderHandler() {
     setInputModalType("new folder");
 }
 
+export const [focusedProject, setFocusedProject] = createSignal<
+    Project | undefined
+>();
+
 const Main: Component = () => {
-    const [focusedProject, setFocusedProject] = createSignal<
-        Project | undefined
-    >();
     function shortcutEventHandler(e: KeyboardEvent) {
         if (e.key === "Escape") {
             setShowInputModal(false);
@@ -78,27 +81,29 @@ const Main: Component = () => {
         <div class="h-screen overflow-hidden">
             <div class="flex gap-4 mx-3 my-2 text-lg w-full max-h-[20%]">
                 <AddDropdown />
-                {/* <button
-                    tabIndex={-1}
-                    onClick={() => openProjectHandler("nvim", allProjects()[0])}
-                    class="px-2 py-1 rounded-lg hover:bg-opacity-50 shadow-[0_1px_3px_1px_#737373] bg-neutral-900 shadow-secondary transition-colors"
-                >
-                    Open Most Recent
-                </button>
-                */}
+                <AddDropdown />
+                <AddDropdown />
                 <button
                     tabIndex={-1}
                     onClick={() => {
                         setShowSettingsModal((prev) => !prev);
                     }}
-                    class={`absolute right-0 mr-2 shadow-secondary transition-colors transition-transform duration-200 hover:rotate-180`}
+                    class={`absolute right-0 mr-2 shadow-secondary transition-transform duration-200 hover:rotate-180`}
                 >
-                    <img class="w-8 h-8" src="../../cog.svg" />
+                    <Cog class="w-8 h-8 drop-shadow-[0_0px_1px_#022c22]" />
                 </button>
             </div>
             <div class="w-full mt-12 flex flex-col flex-1 max-h-[80%]">
-                <h1 class="text-3xl ml-4">Projects</h1>
-                <ProjectList />
+                <h1 class="text-4xl mb-2 ml-4">Projects</h1>
+                <Show when={allProjects()} >
+                    <div class="overflow-y-scroll overflow-x-hidden flex-1">
+                        <For each={allProjects()}>
+                            {(proj) => (
+                                <ProjectListItem proj={proj} />
+                            )}
+                        </For>
+                    </div>
+                </Show>
             </div>
         </div>
     );
